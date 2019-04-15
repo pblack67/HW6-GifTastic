@@ -12,17 +12,20 @@
 </head>
 
 <body>
-    <div id="buttonList"></div>
+    <div class="m-3 p-3 border border-primary rounded">
+        <div id="buttonList"></div>
 
-    <form>
-        <div class="form-group">
-            <label for="subjectName">Enter Animal</label>
-            <input type="text" class="form-control" id="subjectName" placeholder="Enter animal">
-        </div>
-        <button id="addButton" type="submit" class="btn btn-primary">Add</button>
-    </form>
+        <form>
+            <div class="form-group">
+                <label for="subjectName">Enter Animal</label>
+                <input type="text" class="form-control" id="subjectName" placeholder="Enter animal">
+            </div>
+            <button id="addButton" type="submit" class="btn btn-primary">Add</button>
+        </form>
+        <button id="clearButton" class="m-3 btn btn-primary">Clear</button>
+    </div>
 
-    <div id="gifs"></div>
+    <div id="gifs" class="m-3 p-3 border border-primary rounded"></div>
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript" src="assets/javascript/gif.js"></script>

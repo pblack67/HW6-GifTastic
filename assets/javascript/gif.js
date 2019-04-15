@@ -24,7 +24,23 @@ function subjectButtonClicked(event) {
                 attr("data-still", stillURL).
                 attr("data-animated", animatedURL).
                 attr("data-state", "still");
-            $("#gifs").prepend(stillImage);
+
+            // var downloadButton = $("<a>").
+            //     addClass("btn btn-primary").
+            //     text("Download").
+            //     attr("href", animatedURL).
+            //     attr("download", "200.gif");
+
+            var bodyText = $("<p>").text("Rating: " + data[i].rating).addClass("card-text");
+            var bodyDiv = $("<div>").addClass("card-body");
+            bodyDiv.append(bodyText);
+            // bodyDiv.append(downloadButton);
+
+            var card = $("<div>").addClass("card mb-3 mr-3");
+            card.append(stillImage);
+            card.append(bodyDiv);
+
+            $("#gifs").prepend(card);
             stillImage.on("click", imageClicked);
         }
     });

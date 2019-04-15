@@ -6,7 +6,7 @@ function subjectButtonClicked(event) {
     console.log(this);
     $("#gifs").empty();
     var giphyURL = giphyAPI + $(this).attr("data-name");
-    $.get(giphyURL).then(function(response) {
+    $.get(giphyURL).then(function (response) {
         var data = response.data;
         for (var i = 0; i < data.length; i++) {
             console.log(data[i].images.fixed_height.url);
@@ -31,6 +31,11 @@ function createButtons() {
 function addButtonClicked(event) {
     console.log("addButtonClicked");
     event.preventDefault();
+    var buttonName = $("#subjectName").val();
+    if (subjects.indexOf(buttonName) === -1) {
+        subjects.push(buttonName);
+    }
+    createButtons();
 }
 
 // When dom is ready 

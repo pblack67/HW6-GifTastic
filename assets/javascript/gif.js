@@ -1,6 +1,8 @@
 var subjects = ["lions", "tigers", "bears", "dogs", "cats", "hamsters", "gerbils", "squirrels", "wombats", "kangaroos"];
 
-var giphyAPI = "https://api.giphy.com/v1/gifs/search?api_key=AtGUXnRVIUl0BcpMsuJfGwW6O7jLnt2G&limit=10&q="
+var giphyAPI = "https://api.giphy.com/v1/gifs/search?api_key=AtGUXnRVIUl0BcpMsuJfGwW6O7jLnt2G&limit=10&rating=g&q="
+
+var subjectDetails = [];
 
 function imageClicked() {
     if ($(this).attr("data-state") === "still") {
@@ -12,36 +14,51 @@ function imageClicked() {
     }
 }
 
+function favoriteButtonClicked() {
+    console.log("favoriteButtonClicked");
+}
+
+function createSubjectCard(details, element) {
+    var stillImage = $("<img>").attr("src", details.stillURL).
+        attr("data-still", details.stillURL).
+        attr("data-animated", details.animatedURL).
+        attr("data-state", "still");
+
+    var favoriteButton = $("<button>").
+        addClass("btn btn-primary").
+        text("Favorite");
+
+    favoriteButton.on("click", favoriteButtonClicked);
+
+    var bodyText = $("<p>").text("Rating: " + details.rating).addClass("card-text");
+    var bodyText2 = $("<p>").text("Title: " + details.title).addClass("card-text");
+    var bodyDiv = $("<div>").addClass("card-body");
+    bodyDiv.append(bodyText, bodyText2);
+    bodyDiv.append(favoriteButton);
+
+    var card = $("<div>").addClass("card mb-3 mr-3");
+    card.append(stillImage);
+    card.append(bodyDiv);
+
+    element.prepend(card);
+    stillImage.on("click", imageClicked);
+}
+
 function subjectButtonClicked(event) {
     var giphyURL = giphyAPI + $(this).attr("data-name");
     $.get(giphyURL).then(function (response) {
         console.log(response);
         var data = response.data;
         for (var i = 0; i < data.length; i++) {
-            var animatedURL = data[i].images.fixed_height.url;
-            var stillURL = data[i].images.fixed_height_still.url;
-            var stillImage = $("<img>").attr("src", stillURL).
-                attr("data-still", stillURL).
-                attr("data-animated", animatedURL).
-                attr("data-state", "still");
+            var details = {
+                animatedURL: data[i].images.fixed_height.url,
+                stillURL: data[i].images.fixed_height_still.url,
+                bodyText: data[i].rating,
+                bodyText2: data[i].title
+            };
 
-            // var downloadButton = $("<a>").
-            //     addClass("btn btn-primary").
-            //     text("Download").
-            //     attr("href", animatedURL).
-            //     attr("download", "200.gif");
-
-            var bodyText = $("<p>").text("Rating: " + data[i].rating).addClass("card-text");
-            var bodyDiv = $("<div>").addClass("card-body");
-            bodyDiv.append(bodyText);
-            // bodyDiv.append(downloadButton);
-
-            var card = $("<div>").addClass("card mb-3 mr-3");
-            card.append(stillImage);
-            card.append(bodyDiv);
-
-            $("#gifs").prepend(card);
-            stillImage.on("click", imageClicked);
+            subjectDetails.push(details);
+            createSubjectCard(details, $("#gifs"));
         }
     });
 }
@@ -72,6 +89,7 @@ function addButtonClicked(event) {
 
 function clearButtonClicked() {
     $("#gifs").empty();
+    subjectDetails.empty();
 }
 
 // When dom is ready 

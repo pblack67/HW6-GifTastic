@@ -3,6 +3,7 @@ var subjects = ["lions", "tigers", "bears", "dogs", "cats", "hamsters", "gerbils
 var giphyAPI = "https://api.giphy.com/v1/gifs/search?api_key=AtGUXnRVIUl0BcpMsuJfGwW6O7jLnt2G&limit=10&rating=g&q="
 
 var subjectDetails = [];
+var subjectId = 0;
 
 function imageClicked() {
     if ($(this).attr("data-state") === "still") {
@@ -16,27 +17,43 @@ function imageClicked() {
 
 function favoriteButtonClicked() {
     console.log("favoriteButtonClicked");
+    var id = $(this).attr("data-id");
+    var details = null;
+    for (var i = 0; i < subjectDetails.length; i++) {
+        if (subjectDetails[i].subjectId == id) {
+            details = subjectDetails[i];
+            console.log("Found it!", details);
+        }
+    }
+    if (details !== null) {
+        console.log("Attemping to create");
+        createSubjectCard(details, $("#favorites"), id, true);
+    }
 }
 
-function createSubjectCard(details, element) {
+function createSubjectCard(details, element, id, isFavorite) {
     var stillImage = $("<img>").attr("src", details.stillURL).
         attr("data-still", details.stillURL).
         attr("data-animated", details.animatedURL).
         attr("data-state", "still");
 
-    var favoriteButton = $("<button>").
-        addClass("btn btn-primary").
-        text("Favorite");
-
-    favoriteButton.on("click", favoriteButtonClicked);
-
-    var bodyText = $("<p>").text("Rating: " + details.rating).addClass("card-text");
-    var bodyText2 = $("<p>").text("Title: " + details.title).addClass("card-text");
+    var bodyText = $("<p>").text("Rating: " + details.bodyText).addClass("card-text");
+    var bodyText2 = $("<p>").text("Title: " + details.bodyText2).addClass("card-text");
     var bodyDiv = $("<div>").addClass("card-body");
     bodyDiv.append(bodyText, bodyText2);
-    bodyDiv.append(favoriteButton);
 
-    var card = $("<div>").addClass("card mb-3 mr-3");
+    if (!isFavorite) {
+        var favoriteButton = $("<button>").
+            addClass("btn btn-primary").
+            text("Favorite").
+            attr("data-id", id);
+
+        favoriteButton.on("click", favoriteButtonClicked);
+
+        bodyDiv.append(favoriteButton);
+    }
+
+    var card = $("<div>").addClass("card ml-3 mb-3 mr-3");
     card.append(stillImage);
     card.append(bodyDiv);
 
@@ -54,11 +71,12 @@ function subjectButtonClicked(event) {
                 animatedURL: data[i].images.fixed_height.url,
                 stillURL: data[i].images.fixed_height_still.url,
                 bodyText: data[i].rating,
-                bodyText2: data[i].title
+                bodyText2: data[i].title,
+                subjectId: subjectId
             };
 
             subjectDetails.push(details);
-            createSubjectCard(details, $("#gifs"));
+            createSubjectCard(details, $("#gifs"), subjectId++, false);
         }
     });
 }
@@ -90,6 +108,7 @@ function addButtonClicked(event) {
 function clearButtonClicked() {
     $("#gifs").empty();
     subjectDetails.empty();
+    subjectId = 0;
 }
 
 // When dom is ready 

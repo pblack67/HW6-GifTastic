@@ -1,6 +1,22 @@
-var subjects = ["lions", "tigers", "bears", "dogs", "cats", "hamsters", "gerbils", "squirrels", "wombats", "kangaroos"];
+// var subjects = ["lions", "tigers", "bears", "dogs", "cats", "hamsters", "gerbils", "squirrels", "wombats", "kangaroos"];
+var subjects = [
+    {
+        buttonName: "cows",
+        apiName: "giphy"
+    },
+    {
+        buttonName: "alien",
+        apiName: "omdb"
+    },
+    {
+        buttonName: "rush",
+        apiName: "bit"
+    }
+];
 
-var giphyAPI = "https://api.giphy.com/v1/gifs/search?api_key=AtGUXnRVIUl0BcpMsuJfGwW6O7jLnt2G&limit=10&rating=g&q="
+var giphyAPI = "https://api.giphy.com/v1/gifs/search?api_key=AtGUXnRVIUl0BcpMsuJfGwW6O7jLnt2G&limit=10&rating=g&q=";
+var omdbAPI = "http://www.omdbapi.com/?apikey=f8e29b5&t=";
+var bitAPI = "https://rest.bandsintown.com/artists/"; // + artist + "?app_id=nothing",
 
 var subjectDetails = [];
 var favorites = [];
@@ -17,7 +33,6 @@ function imageClicked() {
 }
 
 function favoriteButtonClicked() {
-    console.log("favoriteButtonClicked");
     var id = $(this).attr("data-id");
     var details = null;
     for (var i = 0; i < subjectDetails.length; i++) {
@@ -38,8 +53,8 @@ function createSubjectCard(details, element, id, isFavorite) {
         attr("data-animated", details.animatedURL).
         attr("data-state", "still");
 
-    var bodyText = $("<p>").text("Rating: " + details.bodyText).addClass("card-text");
-    var bodyText2 = $("<p>").text("Title: " + details.bodyText2).addClass("card-text");
+    var bodyText = $("<p>").text(details.title1 + details.bodyText).addClass("card-text");
+    var bodyText2 = $("<p>").text(details.title2 + details.bodyText2).addClass("card-text");
     var bodyDiv = $("<div>").addClass("card-body");
     bodyDiv.append(bodyText, bodyText2);
 
@@ -63,22 +78,65 @@ function createSubjectCard(details, element, id, isFavorite) {
 }
 
 function subjectButtonClicked(event) {
-    var giphyURL = giphyAPI + $(this).attr("data-name");
-    $.get(giphyURL).then(function (response) {
-        console.log(response);
-        var data = response.data;
-        for (var i = 0; i < data.length; i++) {
-            var details = {
-                animatedURL: data[i].images.fixed_height.url,
-                stillURL: data[i].images.fixed_height_still.url,
-                bodyText: data[i].rating,
-                bodyText2: data[i].title,
-                subjectId: subjectId
-            };
+    var apiurl;
+    var apiName = $(this).attr("data-api");
+    console.log(apiName);
+    if (apiName === "giphy") {
+        apiurl = giphyAPI + $(this).attr("data-name");
+    } else if (apiName === "omdb") {
+        apiurl = omdbAPI + $(this).attr("data-name");
+    } else if (apiName === "bit") {
+        apiurl = bitAPI + $(this).attr("data-name") + "?app_id=nothing";
+    }
 
+    $.get(apiurl).then(function (response) {
+        console.log(response);
+
+        if (apiName === "giphy") {
+            var data = response.data;
+            for (var i = 0; i < data.length; i++) {
+                var details;
+                details = {
+                    animatedURL: data[i].images.fixed_height.url,
+                    stillURL: data[i].images.fixed_height_still.url,
+                    bodyText: data[i].rating,
+                    bodyText2: data[i].title,
+                    title1: "Rating: ",
+                    title2: "Title",
+                    subjectId: subjectId,
+                    apiName: apiName
+                };
+                subjectDetails.push(details);
+                createSubjectCard(details, $("#gifs"), subjectId++, false);
+            }
+        } else if (apiName === "omdb") {
+            details = {
+                animatedURL: response.Poster,
+                stillURL: response.Poster,
+                bodyText: response.Actors,
+                bodyText2: response.Director,
+                title1: "Cast: ",
+                title2: "Director: ",
+                subjectId: subjectId,
+                apiName: apiName
+            };
+            subjectDetails.push(details);
+            createSubjectCard(details, $("#gifs"), subjectId++, false);
+        } else if (apiName === "bit") {
+            details = {
+                animatedURL: response.thumb_url,
+                stillURL: response.thumb_url,
+                bodyText: response.name,
+                bodyText2: response.facebook_page_url,
+                title1: "Band Name: ",
+                title2: "Facebook: ",
+                subjectId: subjectId,
+                apiName: apiName
+            };
             subjectDetails.push(details);
             createSubjectCard(details, $("#gifs"), subjectId++, false);
         }
+
     });
 }
 
@@ -86,9 +144,10 @@ function createButtons() {
     $("#buttonList").empty();
     for (var i = 0; i < subjects.length; i++) {
         var newButton = $("<button>").
-            text(subjects[i]).
+            text(subjects[i].buttonName).
             addClass("btn btn-primary subjectButton m-2").
-            attr("data-name", subjects[i]);
+            attr("data-name", subjects[i].buttonName).
+            attr("data-api", subjects[i].apiName);
         $("#buttonList").append(newButton);
     }
     $(".subjectButton").on("click", subjectButtonClicked);
@@ -97,10 +156,15 @@ function createButtons() {
 function addButtonClicked(event) {
     event.preventDefault();
     var buttonName = $("#subjectName").val();
+    var apiName = $("#apiDropDown").val();
     if (buttonName !== "") {
-        if (subjects.indexOf(buttonName) === -1) {
-            subjects.push(buttonName);
-        }
+
+        // if (subjects.indexOf(buttonName) === -1) {
+        subjects.push({
+            buttonName: buttonName,
+            apiName: apiName
+        });
+        // }
     }
     createButtons();
     $("#subjectName").val("");
@@ -108,16 +172,26 @@ function addButtonClicked(event) {
 
 function clearButtonClicked() {
     $("#gifs").empty();
-    subjectDetails.empty();
+    subjectDetails = [];
     subjectId = 0;
 }
 
 function loadFavorites() {
     var jsonFavorites = localStorage.getItem("myFavoriteThings");
     favorites = JSON.parse(jsonFavorites);
-    for (var i = 0; i < favorites.length; i++) {
-        createSubjectCard(favorites[i], $("#favorites"), 0, true);
+    if (favorites != null) {
+        for (var i = 0; i < favorites.length; i++) {
+            createSubjectCard(favorites[i], $("#favorites"), 0, true);
+        }
+    } else {
+        favorites = [];
     }
+}
+
+function dropdownItemClicked() {
+    var val = $(this).val();
+    var text = $(this).text();
+    $("#apiDropDown").val(val).text(text);
 }
 
 // When dom is ready 
@@ -125,6 +199,8 @@ $(function () {
     $("#addButton").on("click", addButtonClicked);
 
     $("#clearButton").on("click", clearButtonClicked);
+
+    $(".dropdown-item").on("click", dropdownItemClicked);
 
     createButtons();
     loadFavorites();

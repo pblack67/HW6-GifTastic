@@ -3,6 +3,7 @@ var subjects = ["lions", "tigers", "bears", "dogs", "cats", "hamsters", "gerbils
 var giphyAPI = "https://api.giphy.com/v1/gifs/search?api_key=AtGUXnRVIUl0BcpMsuJfGwW6O7jLnt2G&limit=10&rating=g&q="
 
 var subjectDetails = [];
+var favorites = [];
 var subjectId = 0;
 
 function imageClicked() {
@@ -22,12 +23,12 @@ function favoriteButtonClicked() {
     for (var i = 0; i < subjectDetails.length; i++) {
         if (subjectDetails[i].subjectId == id) {
             details = subjectDetails[i];
-            console.log("Found it!", details);
         }
     }
     if (details !== null) {
-        console.log("Attemping to create");
         createSubjectCard(details, $("#favorites"), id, true);
+        favorites.push(details);
+        localStorage.setItem("myFavoriteThings", JSON.stringify(favorites));
     }
 }
 
@@ -111,6 +112,14 @@ function clearButtonClicked() {
     subjectId = 0;
 }
 
+function loadFavorites() {
+    var jsonFavorites = localStorage.getItem("myFavoriteThings");
+    favorites = JSON.parse(jsonFavorites);
+    for (var i = 0; i < favorites.length; i++) {
+        createSubjectCard(favorites[i], $("#favorites"), 0, true);
+    }
+}
+
 // When dom is ready 
 $(function () {
     $("#addButton").on("click", addButtonClicked);
@@ -118,4 +127,5 @@ $(function () {
     $("#clearButton").on("click", clearButtonClicked);
 
     createButtons();
+    loadFavorites();
 });

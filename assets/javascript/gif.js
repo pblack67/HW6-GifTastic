@@ -1,4 +1,3 @@
-// var subjects = ["lions", "tigers", "bears", "dogs", "cats", "hamsters", "gerbils", "squirrels", "wombats", "kangaroos"];
 var subjects = [
     {
         buttonName: "cows",
@@ -63,7 +62,18 @@ function createSubjectCard(details, element, id, isFavorite) {
         attr("data-state", "still");
 
     var bodyText = $("<p>").text(details.title1 + details.bodyText).addClass("card-text");
-    var bodyText2 = $("<p>").text(details.title2 + details.bodyText2).addClass("card-text");
+    var bodyText2;
+    if (details.bodyText2.search("http") != -1) {
+        bodyText2 = $("<a>").
+            attr("href", details.bodyText2).
+            attr("target", "_blank");
+    } else {
+        bodyText2 = $("<p>");
+    }
+    bodyText2 = bodyText2.
+        text(details.title2 + details.bodyText2).
+        addClass("card-text");
+
     var bodyDiv = $("<div>").addClass("card-body");
     bodyDiv.append(bodyText, bodyText2);
 

@@ -44,14 +44,10 @@ function favoriteButtonClicked() {
         // Check to see it's not a duplicate
         var isDuplicate = false;
         for (var i = 0; i < favorites.length; i++) {
-            console.log(details.stillURL);
-            console.log(favorites[i].stillURL);
             if (details.stillURL.trim() == favorites[i].stillURL.trim()) {
-                console.log("Found a dup!");
                 isDuplicate = true;
             }
         }
-        console.log(isDuplicate);
         if (!isDuplicate) {
             createSubjectCard(details, $("#favorites"), id, true);
             favorites.push(details);
@@ -90,10 +86,19 @@ function createSubjectCard(details, element, id, isFavorite) {
     stillImage.on("click", imageClicked);
 }
 
+function isSearchDuplicate(details) {
+    var isDuplicate = false;
+    for (var i = 0; i < subjectDetails.length; i++) {
+        if (details.stillURL == subjectDetails[i].stillURL) {
+            isDuplicate = true;
+        }
+    }
+    return isDuplicate;
+}
+
 function subjectButtonClicked(event) {
     var apiurl;
     var apiName = $(this).attr("data-api");
-    console.log(apiName);
     if (apiName === "giphy") {
         apiurl = giphyAPI + $(this).attr("data-name");
     } else if (apiName === "omdb") {
@@ -119,8 +124,10 @@ function subjectButtonClicked(event) {
                     subjectId: subjectId,
                     apiName: apiName
                 };
-                subjectDetails.push(details);
-                createSubjectCard(details, $("#gifs"), subjectId++, false);
+                if (!isSearchDuplicate(details)) {
+                    subjectDetails.push(details);
+                    createSubjectCard(details, $("#gifs"), subjectId++, false);
+                }
             }
         } else if (apiName === "omdb") {
             details = {
@@ -133,8 +140,10 @@ function subjectButtonClicked(event) {
                 subjectId: subjectId,
                 apiName: apiName
             };
-            subjectDetails.push(details);
-            createSubjectCard(details, $("#gifs"), subjectId++, false);
+            if (!isSearchDuplicate(details)) {
+                subjectDetails.push(details);
+                createSubjectCard(details, $("#gifs"), subjectId++, false);
+            }
         } else if (apiName === "bit") {
             details = {
                 animatedURL: response.thumb_url,
@@ -146,8 +155,10 @@ function subjectButtonClicked(event) {
                 subjectId: subjectId,
                 apiName: apiName
             };
-            subjectDetails.push(details);
-            createSubjectCard(details, $("#gifs"), subjectId++, false);
+            if (!isSearchDuplicate(details)) {
+                subjectDetails.push(details);
+                createSubjectCard(details, $("#gifs"), subjectId++, false);
+            }
         }
 
     });
@@ -183,10 +194,16 @@ function addButtonClicked(event) {
     $("#subjectName").val("");
 }
 
-function clearButtonClicked() {
+function clearSearchButtonClicked() {
     $("#gifs").empty();
     subjectDetails = [];
     subjectId = 0;
+}
+
+function clearFavoritesButtonClicked() {
+    $("#favorites").empty();
+    favorites = [];
+    localStorage.setItem("myFavoriteThings", JSON.stringify(favorites));
 }
 
 function loadFavorites() {
@@ -211,7 +228,8 @@ function dropdownItemClicked() {
 $(function () {
     $("#addButton").on("click", addButtonClicked);
 
-    $("#clearButton").on("click", clearButtonClicked);
+    $("#clearSearchButton").on("click", clearSearchButtonClicked);
+    $("#clearFavoritesButton").on("click", clearFavoritesButtonClicked);
 
     $(".dropdown-item").on("click", dropdownItemClicked);
 

@@ -169,7 +169,7 @@ function createButtons() {
     for (var i = 0; i < subjects.length; i++) {
         var newButton = $("<button>").
             text(subjects[i].buttonName).
-            addClass("btn btn-primary subjectButton m-2").
+            addClass("btn btn-primary subjectButton mr-2 mb-2").
             attr("data-name", subjects[i].buttonName).
             attr("data-api", subjects[i].apiName);
         $("#buttonList").append(newButton);

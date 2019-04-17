@@ -41,9 +41,22 @@ function favoriteButtonClicked() {
         }
     }
     if (details !== null) {
-        createSubjectCard(details, $("#favorites"), id, true);
-        favorites.push(details);
-        localStorage.setItem("myFavoriteThings", JSON.stringify(favorites));
+        // Check to see it's not a duplicate
+        var isDuplicate = false;
+        for (var i = 0; i < favorites.length; i++) {
+            console.log(details.stillURL);
+            console.log(favorites[i].stillURL);
+            if (details.stillURL.trim() == favorites[i].stillURL.trim()) {
+                console.log("Found a dup!");
+                isDuplicate = true;
+            }
+        }
+        console.log(isDuplicate);
+        if (!isDuplicate) {
+            createSubjectCard(details, $("#favorites"), id, true);
+            favorites.push(details);
+            localStorage.setItem("myFavoriteThings", JSON.stringify(favorites));
+        }
     }
 }
 
@@ -97,8 +110,8 @@ function subjectButtonClicked(event) {
             for (var i = 0; i < data.length; i++) {
                 var details;
                 details = {
-                    animatedURL: data[i].images.fixed_height.url,
-                    stillURL: data[i].images.fixed_height_still.url,
+                    animatedURL: data[i].images.fixed_width.url,
+                    stillURL: data[i].images.fixed_width_still.url,
                     bodyText: data[i].rating,
                     bodyText2: data[i].title,
                     title1: "Rating: ",

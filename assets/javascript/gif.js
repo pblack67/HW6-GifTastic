@@ -35,6 +35,10 @@ function saveFavorites() {
     localStorage.setItem("myFavoriteThings", JSON.stringify(favorites));
 }
 
+function readFavorites() {
+    return localStorage.getItem("myFavoriteThings");
+}
+
 function favoriteButtonClicked() {
     var id = $(this).attr("data-id");
     var details = null;
@@ -66,13 +70,16 @@ function createSubjectCard(details, element, id, isFavorite) {
         if (bodyItem.bodyText.search("http") != -1) {
             bodyText = $("<a>").
                 attr("href", bodyItem.bodyText).
-                attr("target", "_blank");
+                attr("target", "_blank").
+                text(bodyItem.title).
+                addClass("card-text");
         } else {
-            bodyText = $("<p>");
+            bodyText = $("<p>").
+                text(bodyItem.title + bodyItem.bodyText).
+                addClass("card-text");
         }
 
-        bodyText.text(bodyItem.title + bodyItem.bodyText).
-            addClass("card-text");
+
 
         bodyDiv.append(bodyText);
     }
@@ -98,13 +105,12 @@ function createSubjectCard(details, element, id, isFavorite) {
 }
 
 function isDuplicate(details, detailArray) {
-    var isDuplicate = false;
     for (var i = 0; i < detailArray.length; i++) {
         if (details.stillURL == detailArray[i].stillURL) {
-            isDuplicate = true;
+            return true;
         }
     }
-    return isDuplicate;
+    return false;
 }
 
 function addSubject(details) {
@@ -112,6 +118,86 @@ function addSubject(details) {
         subjectDetails.push(details);
         createSubjectCard(details, $("#gifs"), subjectId++, false);
     }
+}
+
+function addPicture(data, apiName) {
+    var details = {
+        animatedURL: data.images.fixed_width.url,
+        stillURL: data.images.fixed_width_still.url,
+        body: [
+            {
+                title: "Rating: ",
+                bodyText: data.rating
+            },
+            {
+                title: "Title: ",
+                bodyText: data.title
+            }
+        ],
+        subjectId: subjectId,
+        apiName: apiName
+    };
+    addSubject(details);
+}
+
+function addMovie(data, apiName) {
+    var details = {
+        animatedURL: data.Poster,
+        stillURL: data.Poster,
+        body: [
+            {
+                title: "Cast: ",
+                bodyText: data.Actors
+            },
+            {
+                title: "Director: ",
+                bodyText: data.Director
+            },
+            {
+                title: "Released: ",
+                bodyText: data.Released
+            },
+            {
+                title: "Runtime: ",
+                bodyText: data.Runtime
+            },
+            {
+                title: "Website",
+                bodyText: data.Website
+            }
+        ],
+        subjectId: subjectId,
+        apiName: apiName
+    };
+    addSubject(details);
+}
+
+function addBand(data, apiName) {
+    var details = {
+        animatedURL: data.thumb_url,
+        stillURL: data.thumb_url,
+        body: [
+            {
+                title: "Band Name: ",
+                bodyText: data.name
+            },
+            {
+                title: "Facebook",
+                bodyText: data.facebook_page_url
+            },
+            {
+                title: "Upcoming Events: ",
+                bodyText: "" + data.upcoming_event_count
+            },
+            {
+                title: "Bands in Town Page",
+                bodyText: data.url
+            }
+        ],
+        subjectId: subjectId,
+        apiName: apiName
+    };
+    addSubject(details);
 }
 
 function subjectButtonClicked(event) {
@@ -131,60 +217,12 @@ function subjectButtonClicked(event) {
         if (apiName === "giphy") {
             var data = response.data;
             for (var i = 0; i < data.length; i++) {
-                var details = {
-                    animatedURL: data[i].images.fixed_width.url,
-                    stillURL: data[i].images.fixed_width_still.url,
-                    body: [
-                        {
-                            title: "Rating: ",
-                            bodyText: data[i].rating
-                        },
-                        {
-                            title: "Title: ",
-                            bodyText: data[i].title
-                        }
-                    ],
-                    subjectId: subjectId,
-                    apiName: apiName
-                };
-                addSubject(details);
+                addPicture(data[i], apiName);
             }
         } else if (apiName === "omdb") {
-            var details = {
-                animatedURL: response.Poster,
-                stillURL: response.Poster,
-                body: [
-                    {
-                        title: "Cast: ",
-                        bodyText: response.Actors
-                    },
-                    {
-                        title: "Director: ",
-                        bodyText: response.Director
-                    }
-                ],
-                subjectId: subjectId,
-                apiName: apiName
-            };
-            addSubject(details);
+            addMovie(response, apiName);
         } else if (apiName === "bit") {
-            var details = {
-                animatedURL: response.thumb_url,
-                stillURL: response.thumb_url,
-                body: [
-                    {
-                        title: "Band Name: ",
-                        bodyText: response.name
-                    },
-                    {
-                        title: "Facebook: ",
-                        bodyText: response.facebook_page_url
-                    }
-                ],
-                subjectId: subjectId,
-                apiName: apiName
-            };
-            addSubject(details);
+            addBand(response, apiName);
         }
 
     });
@@ -233,7 +271,7 @@ function clearFavoritesButtonClicked() {
 }
 
 function loadFavorites() {
-    var jsonFavorites = localStorage.getItem("myFavoriteThings");
+    var jsonFavorites = readFavorites();
     favorites = JSON.parse(jsonFavorites);
     if (favorites != null) {
         for (var i = 0; i < favorites.length; i++) {

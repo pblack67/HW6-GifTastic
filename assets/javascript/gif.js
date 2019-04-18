@@ -31,6 +31,10 @@ function imageClicked() {
     }
 }
 
+function saveFavorites() {
+    localStorage.setItem("myFavoriteThings", JSON.stringify(favorites));
+}
+
 function favoriteButtonClicked() {
     var id = $(this).attr("data-id");
     var details = null;
@@ -40,17 +44,10 @@ function favoriteButtonClicked() {
         }
     }
     if (details !== null) {
-        // Check to see it's not a duplicate
-        var isDuplicate = false;
-        for (var i = 0; i < favorites.length; i++) {
-            if (details.stillURL.trim() == favorites[i].stillURL.trim()) {
-                isDuplicate = true;
-            }
-        }
-        if (!isDuplicate) {
+        if (!isDuplicate(details, favorites)) {
             createSubjectCard(details, $("#favorites"), id, true);
             favorites.push(details);
-            localStorage.setItem("myFavoriteThings", JSON.stringify(favorites));
+            saveFavorites();
         }
     }
 }
@@ -61,21 +58,25 @@ function createSubjectCard(details, element, id, isFavorite) {
         attr("data-animated", details.animatedURL).
         attr("data-state", "still");
 
-    var bodyText = $("<p>").text(details.title1 + details.bodyText).addClass("card-text");
-    var bodyText2;
-    if (details.bodyText2.search("http") != -1) {
-        bodyText2 = $("<a>").
-            attr("href", details.bodyText2).
-            attr("target", "_blank");
-    } else {
-        bodyText2 = $("<p>");
-    }
-    bodyText2 = bodyText2.
-        text(details.title2 + details.bodyText2).
-        addClass("card-text");
-
     var bodyDiv = $("<div>").addClass("card-body");
-    bodyDiv.append(bodyText, bodyText2);
+
+    for (var i = 0; i < details.body.length; i++) {
+        var bodyItem = details.body[i];
+        var bodyText;
+        if (bodyItem.bodyText.search("http") != -1) {
+            bodyText = $("<a>").
+                attr("href", bodyItem.bodyText).
+                attr("target", "_blank");
+        } else {
+            bodyText = $("<p>");
+        }
+
+        bodyText.text(bodyItem.title + bodyItem.bodyText).
+            addClass("card-text");
+
+        bodyDiv.append(bodyText);
+    }
+
 
     if (!isFavorite) {
         var favoriteButton = $("<button>").
@@ -88,22 +89,29 @@ function createSubjectCard(details, element, id, isFavorite) {
         bodyDiv.append(favoriteButton);
     }
 
-    var card = $("<div>").addClass("card ml-3 mb-3 mr-3");
-    card.append(stillImage);
-    card.append(bodyDiv);
+    var card = $("<div>").addClass("card ml-3 mb-3 mr-3")
+        .append(stillImage)
+        .append(bodyDiv);
 
     element.prepend(card);
     stillImage.on("click", imageClicked);
 }
 
-function isSearchDuplicate(details) {
+function isDuplicate(details, detailArray) {
     var isDuplicate = false;
-    for (var i = 0; i < subjectDetails.length; i++) {
-        if (details.stillURL == subjectDetails[i].stillURL) {
+    for (var i = 0; i < detailArray.length; i++) {
+        if (details.stillURL == detailArray[i].stillURL) {
             isDuplicate = true;
         }
     }
     return isDuplicate;
+}
+
+function addSubject(details) {
+    if (!isDuplicate(details, subjectDetails)) {
+        subjectDetails.push(details);
+        createSubjectCard(details, $("#gifs"), subjectId++, false);
+    }
 }
 
 function subjectButtonClicked(event) {
@@ -123,52 +131,60 @@ function subjectButtonClicked(event) {
         if (apiName === "giphy") {
             var data = response.data;
             for (var i = 0; i < data.length; i++) {
-                var details;
-                details = {
+                var details = {
                     animatedURL: data[i].images.fixed_width.url,
                     stillURL: data[i].images.fixed_width_still.url,
-                    bodyText: data[i].rating,
-                    bodyText2: data[i].title,
-                    title1: "Rating: ",
-                    title2: "Title",
+                    body: [
+                        {
+                            title: "Rating: ",
+                            bodyText: data[i].rating
+                        },
+                        {
+                            title: "Title: ",
+                            bodyText: data[i].title
+                        }
+                    ],
                     subjectId: subjectId,
                     apiName: apiName
                 };
-                if (!isSearchDuplicate(details)) {
-                    subjectDetails.push(details);
-                    createSubjectCard(details, $("#gifs"), subjectId++, false);
-                }
+                addSubject(details);
             }
         } else if (apiName === "omdb") {
-            details = {
+            var details = {
                 animatedURL: response.Poster,
                 stillURL: response.Poster,
-                bodyText: response.Actors,
-                bodyText2: response.Director,
-                title1: "Cast: ",
-                title2: "Director: ",
+                body: [
+                    {
+                        title: "Cast: ",
+                        bodyText: response.Actors
+                    },
+                    {
+                        title: "Director: ",
+                        bodyText: response.Director
+                    }
+                ],
                 subjectId: subjectId,
                 apiName: apiName
             };
-            if (!isSearchDuplicate(details)) {
-                subjectDetails.push(details);
-                createSubjectCard(details, $("#gifs"), subjectId++, false);
-            }
+            addSubject(details);
         } else if (apiName === "bit") {
-            details = {
+            var details = {
                 animatedURL: response.thumb_url,
                 stillURL: response.thumb_url,
-                bodyText: response.name,
-                bodyText2: response.facebook_page_url,
-                title1: "Band Name: ",
-                title2: "Facebook: ",
+                body: [
+                    {
+                        title: "Band Name: ",
+                        bodyText: response.name
+                    },
+                    {
+                        title: "Facebook: ",
+                        bodyText: response.facebook_page_url
+                    }
+                ],
                 subjectId: subjectId,
                 apiName: apiName
             };
-            if (!isSearchDuplicate(details)) {
-                subjectDetails.push(details);
-                createSubjectCard(details, $("#gifs"), subjectId++, false);
-            }
+            addSubject(details);
         }
 
     });
@@ -213,7 +229,7 @@ function clearSearchButtonClicked() {
 function clearFavoritesButtonClicked() {
     $("#favorites").empty();
     favorites = [];
-    localStorage.setItem("myFavoriteThings", JSON.stringify(favorites));
+    saveFavorites();
 }
 
 function loadFavorites() {

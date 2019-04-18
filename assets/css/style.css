@@ -6,3 +6,6 @@ img {
     width: 100px;
 }
 
+.card {
+    max-width: 350px;
+}

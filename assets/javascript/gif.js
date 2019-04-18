@@ -61,7 +61,8 @@ function createSubjectCard(details, element, id, isFavorite) {
     var stillImage = $("<img>").attr("src", details.stillURL).
         attr("data-still", details.stillURL).
         attr("data-animated", details.animatedURL).
-        attr("data-state", "still");
+        attr("data-state", "still").
+        addClass("mx-auto mt-2");
 
     var bodyDiv = $("<div>").addClass("card-body");
 
@@ -76,7 +77,7 @@ function createSubjectCard(details, element, id, isFavorite) {
         } else {
             bodyText = $("<p>").
                 text(bodyItem.title + bodyItem.bodyText).
-                addClass("card-text");
+                addClass("card-text mb-0");
         }
 
         bodyDiv.append(bodyText);
@@ -85,7 +86,7 @@ function createSubjectCard(details, element, id, isFavorite) {
 
     if (!isFavorite) {
         var favoriteButton = $("<button>").
-            addClass("btn btn-primary favoriteButton").
+            addClass("btn btn-primary favoriteButton mt-1").
             text("Favorite").
             attr("data-id", id);
 
@@ -226,7 +227,7 @@ function subjectButtonClicked(event) {
 
 function createButtons() {
     $("#buttonList").empty();
-    subjects.forEach(function(subject) {
+    subjects.forEach(function (subject) {
         var newButton = $("<button>").
             text(subject.buttonName).
             addClass("btn btn-primary subjectButton mr-2 mb-2").
@@ -269,7 +270,7 @@ function loadFavorites() {
     var jsonFavorites = readFavorites();
     favorites = JSON.parse(jsonFavorites);
     if (favorites != null) {
-        favorites.forEach(function(favorite) {
+        favorites.forEach(function (favorite) {
             createSubjectCard(favorite, $("#favorites"), 0, true);
         });
     } else {

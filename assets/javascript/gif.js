@@ -85,11 +85,9 @@ function createSubjectCard(details, element, id, isFavorite) {
 
     if (!isFavorite) {
         var favoriteButton = $("<button>").
-            addClass("btn btn-primary").
+            addClass("btn btn-primary favoriteButton").
             text("Favorite").
             attr("data-id", id);
-
-        favoriteButton.on("click", favoriteButtonClicked);
 
         bodyDiv.append(favoriteButton);
     }
@@ -236,7 +234,6 @@ function createButtons() {
             attr("data-api", subject.apiName);
         $("#buttonList").append(newButton);
     });
-    $(".subjectButton").on("click", subjectButtonClicked);
 }
 
 function addButtonClicked(event) {
@@ -294,6 +291,9 @@ $(function () {
     $("#clearFavoritesButton").on("click", clearFavoritesButtonClicked);
 
     $(".dropdown-item").on("click", dropdownItemClicked);
+
+    $(document).on("click", ".subjectButton", subjectButtonClicked);
+    $(document).on("click", ".favoriteButton", favoriteButtonClicked);
 
     createButtons();
     loadFavorites();

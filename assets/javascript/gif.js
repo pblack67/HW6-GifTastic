@@ -42,11 +42,12 @@ function readFavorites() {
 function favoriteButtonClicked() {
     var id = $(this).attr("data-id");
     var details = null;
-    for (var i = 0; i < subjectDetails.length; i++) {
-        if (subjectDetails[i].subjectId == id) {
-            details = subjectDetails[i];
+    subjectDetails.forEach(function (subjectDetails) {
+        if (subjectDetails.subjectId == id) {
+            details = subjectDetails;
         }
-    }
+    });
+
     if (details !== null) {
         if (!isDuplicate(details, favorites)) {
             createSubjectCard(details, $("#favorites"), id, true);
@@ -64,8 +65,7 @@ function createSubjectCard(details, element, id, isFavorite) {
 
     var bodyDiv = $("<div>").addClass("card-body");
 
-    for (var i = 0; i < details.body.length; i++) {
-        var bodyItem = details.body[i];
+    details.body.forEach(function (bodyItem) {
         var bodyText;
         if (bodyItem.bodyText.search("http") != -1) {
             bodyText = $("<a>").
@@ -79,10 +79,8 @@ function createSubjectCard(details, element, id, isFavorite) {
                 addClass("card-text");
         }
 
-
-
         bodyDiv.append(bodyText);
-    }
+    });
 
 
     if (!isFavorite) {
@@ -216,9 +214,9 @@ function subjectButtonClicked(event) {
 
         if (apiName === "giphy") {
             var data = response.data;
-            for (var i = 0; i < data.length; i++) {
-                addPicture(data[i], apiName);
-            }
+            response.data.forEach(function (dataItem) {
+                addPicture(dataItem, apiName);
+            });
         } else if (apiName === "omdb") {
             addMovie(response, apiName);
         } else if (apiName === "bit") {
@@ -230,14 +228,14 @@ function subjectButtonClicked(event) {
 
 function createButtons() {
     $("#buttonList").empty();
-    for (var i = 0; i < subjects.length; i++) {
+    subjects.forEach(function(subject) {
         var newButton = $("<button>").
-            text(subjects[i].buttonName).
+            text(subject.buttonName).
             addClass("btn btn-primary subjectButton mr-2 mb-2").
-            attr("data-name", subjects[i].buttonName).
-            attr("data-api", subjects[i].apiName);
+            attr("data-name", subject.buttonName).
+            attr("data-api", subject.apiName);
         $("#buttonList").append(newButton);
-    }
+    });
     $(".subjectButton").on("click", subjectButtonClicked);
 }
 
@@ -274,9 +272,9 @@ function loadFavorites() {
     var jsonFavorites = readFavorites();
     favorites = JSON.parse(jsonFavorites);
     if (favorites != null) {
-        for (var i = 0; i < favorites.length; i++) {
-            createSubjectCard(favorites[i], $("#favorites"), 0, true);
-        }
+        favorites.forEach(function(favorite) {
+            createSubjectCard(favorite, $("#favorites"), 0, true);
+        });
     } else {
         favorites = [];
     }

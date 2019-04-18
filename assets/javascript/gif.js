@@ -14,7 +14,7 @@ var subjects = [
 ];
 
 var giphyAPI = "https://api.giphy.com/v1/gifs/search?api_key=AtGUXnRVIUl0BcpMsuJfGwW6O7jLnt2G&limit=10&rating=g&q=";
-var omdbAPI = "http://www.omdbapi.com/?apikey=f8e29b5&t=";
+var omdbAPI = "https://www.omdbapi.com/?apikey=f8e29b5&t=";
 var bitAPI = "https://rest.bandsintown.com/artists/"; // + artist + "?app_id=nothing",
 
 var subjectDetails = [];
@@ -90,7 +90,7 @@ function createSubjectCard(details, element, id, isFavorite) {
             text("Favorite").
             attr("data-id", id);
 
-        bodyDiv.append(favoriteButton);
+        bodyDiv.append($("<div>").append(favoriteButton));
     }
 
     var card = $("<div>").addClass("card ml-3 mb-3 mr-3")

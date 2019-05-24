@@ -6,7 +6,7 @@
 
 ## Overview
 
-This application allows the user to create a collection of their favorite things: GIFs, Movies and Bands. The user creates a query button by typing in the search term, choosing the query type in the dropdown and then clicking the Add button. Clicking the query button  will hit the desired back-end API and add the results to the search area. Each search result has a Favorites button. Clicking on this adds the item to the favorites area. These favorites will persist event if the browser is closed and re-opened. 
+This application allows the user to create a collection of their favorite things: GIFs, Movies and Bands. The user creates a query button by typing in the search term, choosing the query type in the dropdown and then clicking the Add button. Clicking the query button will hit the desired back-end API and add the results to the search area. Each search result has a Favorites button. Clicking on this adds the item to the favorites area. These favorites will persist event if the browser is closed and re-opened. 
 
 ## Architecture
 

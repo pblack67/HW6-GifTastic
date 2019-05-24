@@ -1,4 +1,4 @@
-var subjects = [
+const subjects = [
     {
         buttonName: "cows",
         apiName: "giphy"
@@ -13,13 +13,13 @@ var subjects = [
     }
 ];
 
-var giphyAPI = "https://api.giphy.com/v1/gifs/search?api_key=AtGUXnRVIUl0BcpMsuJfGwW6O7jLnt2G&limit=10&rating=g&q=";
-var omdbAPI = "https://www.omdbapi.com/?apikey=f8e29b5&t=";
-var bitAPI = "https://rest.bandsintown.com/artists/"; // + artist + "?app_id=nothing",
+const giphyAPI = "https://api.giphy.com/v1/gifs/search?api_key=AtGUXnRVIUl0BcpMsuJfGwW6O7jLnt2G&limit=10&rating=g&q=";
+const omdbAPI = "https://www.omdbapi.com/?apikey=f8e29b5&t=";
+const bitAPI = "https://rest.bandsintown.com/artists/"; // + artist + "?app_id=nothing",
 
-var subjectDetails = [];
-var favorites = [];
-var subjectId = 0;
+let subjectDetails = [];
+let favorites = [];
+let subjectId = 0;
 
 function imageClicked() {
     if ($(this).attr("data-state") === "still") {
@@ -40,8 +40,8 @@ function readFavorites() {
 }
 
 function favoriteButtonClicked() {
-    var id = $(this).attr("data-id");
-    var details = null;
+    let id = $(this).attr("data-id");
+    let details = null;
     subjectDetails.forEach(function (subjectDetails) {
         if (subjectDetails.subjectId == id) {
             details = subjectDetails;
@@ -58,16 +58,16 @@ function favoriteButtonClicked() {
 }
 
 function createSubjectCard(details, element, id, isFavorite) {
-    var stillImage = $("<img>").attr("src", details.stillURL).
+    let stillImage = $("<img>").attr("src", details.stillURL).
         attr("data-still", details.stillURL).
         attr("data-animated", details.animatedURL).
         attr("data-state", "still").
         addClass("mx-auto mt-2");
 
-    var bodyDiv = $("<div>").addClass("card-body");
+    let bodyDiv = $("<div>").addClass("card-body");
 
     details.body.forEach(function (bodyItem) {
-        var bodyText;
+        let bodyText;
         if (bodyItem.bodyText.search("http") != -1) {
             bodyText = $("<a>").
                 attr("href", bodyItem.bodyText).
@@ -85,7 +85,7 @@ function createSubjectCard(details, element, id, isFavorite) {
 
 
     if (!isFavorite) {
-        var favoriteButton = $("<button>").
+        let favoriteButton = $("<button>").
             addClass("btn btn-primary favoriteButton mt-1").
             text("Favorite").
             attr("data-id", id);
@@ -93,7 +93,7 @@ function createSubjectCard(details, element, id, isFavorite) {
         bodyDiv.append($("<div>").append(favoriteButton));
     }
 
-    var card = $("<div>").addClass("card ml-3 mb-3 mr-3")
+    let card = $("<div>").addClass("card ml-3 mb-3 mr-3")
         .append(stillImage)
         .append(bodyDiv);
 
@@ -102,7 +102,7 @@ function createSubjectCard(details, element, id, isFavorite) {
 }
 
 function isDuplicate(details, detailArray) {
-    for (var i = 0; i < detailArray.length; i++) {
+    for (let i = 0; i < detailArray.length; i++) {
         if (details.stillURL == detailArray[i].stillURL) {
             return true;
         }
@@ -118,7 +118,7 @@ function addSubject(details) {
 }
 
 function addPicture(data, apiName) {
-    var details = {
+    let details = {
         animatedURL: data.images.fixed_width.url,
         stillURL: data.images.fixed_width_still.url,
         body: [
@@ -138,7 +138,7 @@ function addPicture(data, apiName) {
 }
 
 function addMovie(data, apiName) {
-    var details = {
+    let details = {
         animatedURL: data.Poster,
         stillURL: data.Poster,
         body: [
@@ -170,7 +170,7 @@ function addMovie(data, apiName) {
 }
 
 function addBand(data, apiName) {
-    var details = {
+    let details = {
         animatedURL: data.thumb_url,
         stillURL: data.thumb_url,
         body: [
@@ -198,8 +198,8 @@ function addBand(data, apiName) {
 }
 
 function subjectButtonClicked(event) {
-    var apiurl;
-    var apiName = $(this).attr("data-api");
+    let apiurl;
+    let apiName = $(this).attr("data-api");
     if (apiName === "giphy") {
         apiurl = giphyAPI + $(this).attr("data-name");
     } else if (apiName === "omdb") {
@@ -212,7 +212,7 @@ function subjectButtonClicked(event) {
         console.log(response);
 
         if (apiName === "giphy") {
-            var data = response.data;
+            let data = response.data;
             response.data.forEach(function (dataItem) {
                 addPicture(dataItem, apiName);
             });
@@ -228,7 +228,7 @@ function subjectButtonClicked(event) {
 function createButtons() {
     $("#buttonList").empty();
     subjects.forEach(function (subject) {
-        var newButton = $("<button>").
+        let newButton = $("<button>").
             text(subject.buttonName).
             addClass("btn btn-primary subjectButton mr-2 mb-2").
             attr("data-name", subject.buttonName).
@@ -239,8 +239,8 @@ function createButtons() {
 
 function addButtonClicked(event) {
     event.preventDefault();
-    var buttonName = $("#subjectName").val();
-    var apiName = $("#apiDropDown").val();
+    let buttonName = $("#subjectName").val();
+    let apiName = $("#apiDropDown").val();
     if (buttonName !== "") {
 
         // if (subjects.indexOf(buttonName) === -1) {
@@ -267,7 +267,7 @@ function clearFavoritesButtonClicked() {
 }
 
 function loadFavorites() {
-    var jsonFavorites = readFavorites();
+    let jsonFavorites = readFavorites();
     favorites = JSON.parse(jsonFavorites);
     if (favorites != null) {
         favorites.forEach(function (favorite) {
@@ -279,8 +279,8 @@ function loadFavorites() {
 }
 
 function dropdownItemClicked() {
-    var val = $(this).val();
-    var text = $(this).text();
+    let val = $(this).val();
+    let text = $(this).text();
     $("#apiDropDown").val(val).text(text);
 }
 

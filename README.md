@@ -2,6 +2,9 @@
 
 * URL: [https://pblack67.github.io/MyFavoriteThings/](https://pblack67.github.io/MyFavoriteThings/)
 
+![Search](/images/search.png)
+![Favorite](/images/favorite.png)
+
 * Technologies: HTML, CSS, Bootstrap, JavaScript, Events, jQuery, Objects, AJAX, Local Storage, JSON
 
 ## Overview
